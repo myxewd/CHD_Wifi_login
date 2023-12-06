@@ -7,3 +7,5 @@ Then , create a timed task to call to this script.
 ```
 python chd_login.py
 ```
+
+Please make sure that your device is directly connected to the campus WIFI instead of through a springboard ! 
