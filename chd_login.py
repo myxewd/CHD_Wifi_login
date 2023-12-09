@@ -46,16 +46,21 @@ def base64_encode(input_string):
     def encode_block(block):
         indices = [block >> 18 & 63, block >> 12 & 63, block >> 6 & 63, block & 63]
         return "".join(base64_chars[i] for i in indices)
+    
     byte_string = input_string.encode('latin_1')
     encoded = ""
-    for i in range(0, len(byte_string), 3):
-        block = (byte_string[i] << 16) + (byte_string[i + 1] << 8) + byte_string[i + 2] if i + 2 < len(byte_string) else 0
-        encoded += encode_block(block)
     padding = len(byte_string) % 3
+    byte_string += b'\x00' * (3 - padding) if padding else b''
+    
+    for i in range(0, len(byte_string), 3):
+        block = (byte_string[i] << 16) + (byte_string[i + 1] << 8) + byte_string[i + 2]
+        encoded += encode_block(block)
+    
     if padding == 1:
         encoded = encoded[:-2] + "=="
     elif padding == 2:
         encoded = encoded[:-1] + "="
+    
     return encoded
 
 #Dword
@@ -134,7 +139,6 @@ def encode(str, key):
         m = int32(m)
         z = int32((v[n] + m) & (0xBB390742 | 0x44C6F8BD))
         v[n] = z
-        print(v)
         q -= 1
     return l(v, False)
 
@@ -179,6 +183,7 @@ def login(username, password):
     
     user_data_str = json.dumps(user_data, separators=(',', ':'))
     i = encode_user_info(user_data_str,token)
+    print(encode_user_info("123","abc"))
     cstr = (
     str(token) + str(username) +
     str(token) + str(hpmd5) +
