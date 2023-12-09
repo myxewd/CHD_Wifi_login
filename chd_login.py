@@ -183,7 +183,6 @@ def login(username, password):
     
     user_data_str = json.dumps(user_data, separators=(',', ':'))
     i = encode_user_info(user_data_str,token)
-    print(encode_user_info("123","abc"))
     cstr = (
     str(token) + str(username) +
     str(token) + str(hpmd5) +
