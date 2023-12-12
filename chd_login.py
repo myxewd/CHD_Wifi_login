@@ -1,7 +1,7 @@
 import time
 import re
+import subprocess
 import json
-import socket
 import hashlib
 from urllib.parse import urlencode, urlunparse
 import requests
@@ -17,9 +17,16 @@ def get_time():
     return timestamp
 
 def get_wan_ip():
-    hostname = socket.gethostname()
-    ip_address = socket.gethostbyname(hostname)
-    return ip_address
+    def extract_inet_addr(data, interface_name):
+        lines = data.split('\n')
+        interface_found = False
+        for line in lines:
+            if line.startswith(interface_name):
+                interface_found = True
+            elif interface_found and line.strip().startswith('inet addr:'):
+                return line.split('inet addr:')[1].split()[0]
+    ifc_text = subprocess.run('ifconfig -a', shell=True, capture_output=True, text=True).stdout
+    return extract_inet_addr(ifc_text,'wan')
 
 def hmd5(password, token):
     combined_str = password + token
@@ -155,6 +162,7 @@ def login(username, password):
     n = 200
     enc = "srun_bx1"
     wan_ip = get_wan_ip()
+    print(wan_ip)
 
     timestamp = get_time()
     token = get_token()
@@ -212,8 +220,8 @@ def login(username, password):
         '_': timestamp
     }
     url = base_url + '?' + urlencode(params)
-    requests.get(url)
-    
+    login_ret = requests.get(url)
+    print(login_ret.text)
     return
 
 
